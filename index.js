@@ -5,6 +5,7 @@ const argv = require('yargs').option('n',{
 }).argv;
 require('colors');
 
+const fs = require('fs');
 //Constants and contents for archives
 //Content of index archive
 const indexContent = `import * as components from "./components";
@@ -14,6 +15,16 @@ export default { components, containers }
 `;
 const modelContent = `import * as yup from "yup";`;
 const utilsContent = `import * as yup from "yup";`;
+const indexContentSections = (name) => `import React from 'react';
+const ${name} = (props)=>{
+    return(
+        <section>
+            //Content
+        </section>
+    )
+}
+export default ${name};
+`;
 
 
 console.clear();
@@ -37,12 +48,25 @@ const main = async ()=>{
         case "create:component":
             console.log('Crea un componente');
             break;
-        case "create:menu":
-            console.log('Crea un menu');
+        case "create:section":
+            console.log(`Creando seccion ${argv.n} en el proyecto`);
+            const name = `${argv.n}Section`;
+            const principalCarpet = `./${name}`;
+            fs.mkdir(name,(error)=>{
+                if(error){
+                    console.log(error);
+                }else{
+                    fs.mkdirSync(`${principalCarpet}/styles`);
+                    fs.mkdirSync(`${principalCarpet}/constants`);
+                    fs.mkdirSync(`${principalCarpet}/components`);
+                    fs.writeFileSync(`${principalCarpet}/index.jsx`,indexContentSections(name),(err)=>{
+                        if(err) console.log(err);
+                    });
+                }
+            });
             break;
         case "create:module":
             console.log(`Creando modulo ${argv.n}`);
-            const fs = require('fs');
             const modulo = `${argv.n}Module`;
             fs.mkdir(modulo,(error)=>{
                 if(error){
